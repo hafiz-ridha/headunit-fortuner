@@ -9,6 +9,8 @@ bergantian kapan saja.
 Diuji di headunit Unisoc UMS512 (TS10/UIS7862), Android 10, 1280×720. Layout juga dicek di 1024×600 dan
 1920×1080 (240 dpi).
 
+**Cara pasang:** lihat [tutorial singkat dari koneksi ADB](docs/TUTORIAL.md).
+
 ## Screenshot
 
 Diambil langsung dari headunit (1280×720).
