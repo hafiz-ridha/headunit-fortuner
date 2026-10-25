@@ -9,6 +9,20 @@ bergantian kapan saja.
 Diuji di headunit Unisoc UMS512 (TS10/UIS7862), Android 10, 1280×720. Layout juga dicek di 1024×600 dan
 1920×1080 (240 dpi).
 
+## Screenshot
+
+Diambil langsung dari headunit (1280×720).
+
+![Beranda](docs/screenshots/beranda-1280x720.png)
+
+| Fortuner 360° diputar ke samping | Diputar ke depan |
+|---|---|
+| ![Mobil 360 samping](docs/screenshots/mobil-360-samping.png) | ![Mobil 360 depan](docs/screenshots/mobil-360-depan.png) |
+
+| Halaman Al-Qur'an | Doa naik kendaraan |
+|---|---|
+| ![Al-Qur'an](docs/screenshots/alquran.png) | ![Doa naik kendaraan](docs/screenshots/doa-naik-kendaraan.png) |
+
 ## Fitur
 
 | Bagian | Isi | Sumber data |
