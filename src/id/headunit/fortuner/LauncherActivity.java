@@ -48,6 +48,8 @@ public class LauncherActivity extends Activity implements LocationTracker.Listen
     private QuranPage quranPage;
     private String page = NavigationSidebar.HOME;
     private int builtW, builtH;
+    private boolean resumed;
+    private boolean rebuildPending;
     private boolean receiversOn;
     private TelephonyManager telephony;
     private ConnectivityManager connectivity;
@@ -65,7 +67,14 @@ public class LauncherActivity extends Activity implements LocationTracker.Listen
         root = new FrameLayout(this) {
             @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
                 super.onSizeChanged(w, h, ow, oh);
-                if (w > 0 && h > 0 && (Math.abs(w - builtW) > 2 || Math.abs(h - builtH) > 2)) post(() -> build(w, h));
+                if (w <= 0 || h <= 0) return;
+                if (builtW == 0) {
+                    post(() -> build(w, h));
+                } else if (needsRebuild(w, h)) {
+                    // Jangan membangun ulang saat tertutup (mis. kamera mundur): tunda sampai launcher tampil lagi.
+                    if (resumed) post(() -> build(w, h));
+                    else rebuildPending = true;
+                }
             }
         };
         root.setBackgroundColor(Ui.BG);
@@ -73,6 +82,15 @@ public class LauncherActivity extends Activity implements LocationTracker.Listen
         applyWindowMode();
         if (ACTION_OPEN_QURAN.equals(getIntent().getAction())) page = PAGE_QURAN;
         if (!tracker.hasPermission() && state == null) requestLocationPermission();
+    }
+
+    /**
+     * Ukuran berubah cukup jauh untuk dibangun ulang? Status bar yang disembunyikan/dimunculkan aplikasi lain
+     * (mis. kamera mundur: 662 &lt;-&gt; 720 px) hanya mengubah tinggi ±9%; tata letak berbobot cukup menyesuaikan
+     * tanpa membangun ulang semuanya.
+     */
+    private boolean needsRebuild(int w, int h) {
+        return Math.abs(w - builtW) > 2 || Math.abs(h - builtH) > builtH * 0.12f;
     }
 
     /** Membangun seluruh UI untuk ukuran jendela tertentu. */
@@ -172,10 +190,22 @@ public class LauncherActivity extends Activity implements LocationTracker.Listen
     @Override
     protected void onResume() {
         super.onResume();
+        resumed = true;
+        if (rebuildPending) {
+            rebuildPending = false;
+            int w = root.getWidth(), h = root.getHeight();
+            if (w > 0 && h > 0 && needsRebuild(w, h)) build(w, h);
+        }
         applyWindowMode();
         refreshStatus();
         refreshApps();
         if (dashboard != null) dashboard.controls.refreshVolume();
+    }
+
+    @Override
+    protected void onPause() {
+        resumed = false;
+        super.onPause();
     }
 
     @Override

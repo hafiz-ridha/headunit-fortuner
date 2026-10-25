@@ -92,6 +92,12 @@ adb -s 192.168.18.136:5555 shell cmd package set-home-activity id.headunit.fortu
 4. Matikan mobil minimal 30 detik lalu nyalakan: Fortuner Launcher tampil dan doa diputar. Riwayatnya ada di
    **Pengaturan › Doa perjalanan › Riwayat pemicu doa**.
 
+### Kamera mundur bergaris/terpotong-potong
+
+Bila gambar kamera mundur rusak (bergaris, terpotong, berulang), format video kamera tidak cocok. Buka
+**Pengaturan Kendaraan › Reverse setting › HD selection** dan pilih **NTSC** (format yang cocok untuk kamera mobil
+ini), lalu masukkan gigi R untuk mengecek.
+
 ## 8. Update dan kembali ke launcher bawaan
 
 - **Update**: ulangi langkah 4 dan 5. Pengaturan dan murattal yang sudah diunduh tetap ada.

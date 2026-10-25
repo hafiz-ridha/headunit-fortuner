@@ -35,9 +35,9 @@ Diambil langsung dari headunit (1280×720).
 | Panel mobil | Fortuner putih 360° (berputar mengikuti jari, berhenti saat jari dilepas, kembali ke sudut awal setelah 8 detik), kecepatan, status GPS, Trip GPS (tekan lama untuk reset) | 72 gambar render dari model 3D, GPS headunit |
 | Kartu utama | YouTube (aplikasi YouTube; bila belum terpasang, menawarkan Play Store), Navigasi (Maps/Waze/dll.), Al-Qur'an | Aplikasi terpasang |
 | Widget Al-Qur'an | Ayat Arab (RTL), transliterasi, terjemahan, ayat sebelum/berikut, putar/jeda, buka mushaf, pilihan tampilan | `assets/quran` (equran.id / Kemenag RI) |
-| Halaman Al-Qur'an | 114 surah, 6.236 ayat, murattal per ayat yang lanjut otomatis, unduh per surah atau semua | idem, audio dari cdn.equran.id |
+| Halaman Al-Qur'an | 114 surah, 6.236 ayat, murattal per ayat yang lanjut otomatis ke surah berikutnya sampai An-Nas, unduh per surah atau semua | idem, audio dari cdn.equran.id |
 | Murattal offline | Audio diunduh ke `Android/data/id.headunit.fortuner/files/murattal` (±1,5–2 GB untuk semua). Unduh otomatis di Wi-Fi rumah; bisa dijeda/dihapus di Pengaturan | cdn.equran.id |
-| Doa naik kendaraan | Saat headunit menyala (boot, atau layar menyala lagi setelah mati ≥1 menit): overlay doa QS. Az-Zukhruf 13–14 + audio di speaker, tanpa internet | `assets/doa` |
+| Doa naik kendaraan | Saat headunit menyala (boot, atau layar menyala lagi setelah mati ≥1 menit): overlay doa QS. Az-Zukhruf 13–14 + audio di speaker (volume minimal 80% + penguatan 6 dB), tanpa internet; overlay disembunyikan selama kamera mundur tampil | `assets/doa` |
 | Dock | Musik, Bluetooth, Radio, Video, File Manager, Equalizer, Car Link, DSP | Aplikasi TW headunit |
 | Panel kontrol | Pengaturan kendaraan (CarSetting), volume | AudioManager |
 

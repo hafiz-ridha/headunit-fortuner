@@ -20,7 +20,7 @@ com.android.hotspot2                     # login Passpoint WiFi
 com.sprd.logmanager                      # pencatat log Unisoc (makan CPU/storage)
 com.sprd.autoslt                         # tes pabrik
 com.sprd.validationtools                 # tes pabrik
-com.sprd.cameracalibration               # kalibrasi kamera pabrik
+com.sprd.cameracalibration               # kalibrasi kamera pabrik (bukan kamera mundur)
 com.spreadtrum.sgps                      # aplikasi tes GPS (bukan GPS-nya)
 com.sprd.omacp                           # provisioning SMS operator
 com.tw.bug.report                        # pelapor bug TW
@@ -31,3 +31,6 @@ com.google.android.googlequicksearchbox  # Google app/Assistant (~235 MB RAM). E
 com.android.chrome                       # Chrome (~140 MB RAM). Efek: tidak ada browser; WebView tetap jalan
 com.abupdate.fota_demo_iot               # FOTA demo. Efek: tidak ada notifikasi update OTA
 com.sprd.firewall                        # blokir panggilan. Efek: fitur blokir nomor hilang
+
+# Catatan 25/10: kamera mundur sempat rusak karena format video berubah (harus NTSC, lihat docs/TUTORIAL.md).
+# Sudah dites: dengan SEMUA paket debloat aktif kamera tetap rusak, jadi debloat bukan penyebabnya.

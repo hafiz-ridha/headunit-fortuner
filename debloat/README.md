@@ -13,3 +13,8 @@ Mengembalikan semuanya:
 ```bash
 adb -s 192.168.18.136:5555 shell < debloat/restore_tier1.sh
 ```
+
+## Status
+
+25/10/2026: semua 22 paket Tier 1 kembali dinonaktifkan. Sempat diaktifkan semua untuk menguji kamera mundur;
+hasilnya debloat bukan penyebab (penyebabnya format video kamera, harus NTSC).

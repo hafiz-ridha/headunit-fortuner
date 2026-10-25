@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Posisi baca (surah:ayat) dan pemutar murattal per ayat. Audio diambil dari unduhan offline
  * ({@link QuranAudioStore}) bila ada, selain itu di-stream dari cdn.equran.id; setelah satu ayat selesai,
- * ayat berikutnya diputar sampai akhir surah. Tombol media (termasuk tombol setir bila
+ * ayat berikutnya diputar, lalu lanjut ke surah berikutnya sampai An-Nas. Tombol media (termasuk tombol setir bila
  * headunit meneruskannya) dikendalikan lewat MediaSession.
  */
 final class QuranPlayer {
@@ -195,13 +195,17 @@ final class QuranPlayer {
             playing = false;
             QuranRepository.SurahInfo info = repo.info(surah);
             if (info != null && ayah < info.ayahCount) {
-                surah = info.number;
                 ayah = ayah + 1;
-                Prefs.get(context).edit().putInt(Prefs.QURAN_AYAH, ayah).apply();
-                playCurrent();
+            } else if (surah < 114) {
+                // Akhir surah: lanjut otomatis ke ayat pertama surah berikutnya.
+                surah = surah + 1;
+                ayah = 1;
             } else {
-                stop();
+                stop(); // akhir mushaf (An-Nas)
+                return;
             }
+            Prefs.get(context).edit().putInt(Prefs.QURAN_SURAH, surah).putInt(Prefs.QURAN_AYAH, ayah).apply();
+            playCurrent();
         });
         player.setOnErrorListener((mp, what, extra) -> {
             Log.w(AppLauncherRepository.TAG, "MediaPlayer error " + what + "/" + extra);

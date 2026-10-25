@@ -41,6 +41,10 @@ public class DoaService extends Service {
     private static final String CHANNEL = "doa";
     private static final int ID = 9;
     private static final long CLOSE_AFTER_AUDIO_MS = 5000;
+    /** Volume media minimal selama doa (porsi dari volume maksimum); dikembalikan lagi setelah doa selesai. */
+    private static final float MIN_VOLUME = 0.8f;
+    /** Penguatan tambahan lewat LoudnessEnhancer (mB; 600 = +6 dB, dibatasi limiter agar tidak pecah). */
+    private static final int BOOST_MB = 600;
 
     private final Handler main = new Handler(Looper.getMainLooper());
     private MediaPlayer player;
@@ -49,6 +53,9 @@ public class DoaService extends Service {
     private AudioManager audio;
     private AudioFocusRequest focus;
     private JSONObject doa;
+    private final java.util.List<android.media.audiofx.LoudnessEnhancer> boosts = new java.util.ArrayList<>();
+    private int savedVolume = -1;
+    private int raisedVolume = -1;
 
     @Override
     public void onCreate() {
@@ -112,6 +119,7 @@ public class DoaService extends Service {
             } else {
                 audio.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
             }
+            raiseVolume();
             // Potongan audio diputar berurutan tanpa jeda: ayat 13 mulai dari "subḥānal-lażī" lalu ayat 14.
             org.json.JSONArray parts = doa.optJSONArray("audio");
             MediaPlayer previous = null;
@@ -128,6 +136,7 @@ public class DoaService extends Service {
                     return true;
                 });
                 mp.prepare();
+                boost(mp);
                 int start = part.optInt("startMs", 0);
                 if (start > 0) {
                     if (Build.VERSION.SDK_INT >= 26) mp.seekTo(start, MediaPlayer.SEEK_CLOSEST);
@@ -154,6 +163,41 @@ public class DoaService extends Service {
             main.postDelayed(this::finish, 15000);
         }
     }
+
+    /** Naikkan volume media sementara bila sedang lebih kecil dari {@link #MIN_VOLUME}. */
+    private void raiseVolume() {
+        int max = audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        int cur = audio.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int target = Math.round(max * MIN_VOLUME);
+        if (cur < target) {
+            savedVolume = cur;
+            raisedVolume = target;
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, target, 0);
+        }
+    }
+
+    private void boost(MediaPlayer mp) {
+        try {
+            android.media.audiofx.LoudnessEnhancer le = new android.media.audiofx.LoudnessEnhancer(mp.getAudioSessionId());
+            le.setTargetGain(BOOST_MB);
+            le.setEnabled(true);
+            boosts.add(le);
+        } catch (RuntimeException e) {
+            Log.w(AppLauncherRepository.TAG, "Penguat suara doa tidak tersedia", e);
+        }
+    }
+
+    /** Overlay doa tidak boleh menutupi kamera mundur/samping: sembunyikan selama kamera tampil. */
+    private final Runnable cameraWatch = new Runnable() {
+        @Override
+        public void run() {
+            if (overlay != null) {
+                boolean camera = CarCamera.active(DoaService.this);
+                overlay.setVisibility(camera ? View.GONE : View.VISIBLE);
+                main.postDelayed(this, 300);
+            }
+        }
+    };
 
     private static AudioAttributes attributes() {
         return new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA)
@@ -223,8 +267,10 @@ public class DoaService extends Service {
         lp.gravity = Gravity.CENTER;
         lp.windowAnimations = android.R.style.Animation_Dialog;
         try {
+            if (CarCamera.active(this)) card.setVisibility(View.GONE);
             wm.addView(card, lp);
             overlay = card;
+            main.postDelayed(cameraWatch, 300);
         } catch (RuntimeException e) {
             Log.w(AppLauncherRepository.TAG, "Overlay doa gagal ditampilkan", e);
         }
@@ -252,7 +298,13 @@ public class DoaService extends Service {
     @Override
     public void onDestroy() {
         main.removeCallbacksAndMessages(null);
+        for (android.media.audiofx.LoudnessEnhancer le : boosts) le.release();
+        boosts.clear();
         for (MediaPlayer mp : players) mp.release();
+        // Kembalikan volume, kecuali pengguna sudah mengubahnya sendiri selama doa.
+        if (savedVolume >= 0 && audio.getStreamVolume(AudioManager.STREAM_MUSIC) == raisedVolume) {
+            audio.setStreamVolume(AudioManager.STREAM_MUSIC, savedVolume, 0);
+        }
         players.clear();
         player = null;
         if (Build.VERSION.SDK_INT >= 26) {

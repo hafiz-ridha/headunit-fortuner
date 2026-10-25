@@ -30,6 +30,7 @@ final class QuranPage extends LinearLayout implements QuranPlayer.Listener {
     private final TextView offlineInfo;
     private final TextView downloadAll;
     private int shownSurah;
+    private int lastPlayedSurah;
     private final Runnable onDownload = this::refreshDownload;
     private List<QuranRepository.Ayah> ayat = Collections.emptyList();
 
@@ -185,6 +186,12 @@ final class QuranPage extends LinearLayout implements QuranPlayer.Listener {
 
     @Override
     public void onQuranChanged() {
+        // Autoplay pindah ke surah berikutnya: mushaf ikut berpindah bila sedang menampilkan surah yang diputar.
+        if (player.isPlaying() && player.surah() != shownSurah && lastPlayedSurah == shownSurah) {
+            showSurah(player.surah(), true);
+            surahList.smoothScrollToPosition(player.surah() - 1);
+        }
+        if (player.isPlaying()) lastPlayedSurah = player.surah();
         updatePlay();
         ayahAdapter.notifyDataSetChanged();
         if (player.isPlaying() && player.surah() == shownSurah) {

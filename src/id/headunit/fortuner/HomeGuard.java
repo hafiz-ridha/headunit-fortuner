@@ -33,6 +33,8 @@ final class HomeGuard {
     private static void check(Context c) {
         String[] top = foreground(c);
         if (top == null || !DOFUN.equals(top[0]) || !top[1].endsWith("Launcher")) return;
+        // Jangan pernah menyela kamera mundur/samping, termasuk yang baru saja dibuka atau ditutup.
+        if (CarCamera.activeOrRecent(c, 20_000)) return;
         Log.i(AppLauncherRepository.TAG, "Launcher Dofun muncul sendiri setelah menyala; kembali ke Fortuner Launcher");
         try {
             c.startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME)

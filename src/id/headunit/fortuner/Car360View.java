@@ -87,6 +87,8 @@ final class Car360View extends View {
         final int gen = ++generation;
         final int startIndex = index(angle);
         loader.execute(() -> {
+            // Prioritas rendah: jangan berebut CPU dengan kamera mundur atau UI.
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND);
             for (int k = 0; k < frames; k++) {
                 if (gen != generation) return;
                 int i = (startIndex + ((k % 2 == 0) ? k / 2 : frames - (k + 1) / 2)) % frames;
