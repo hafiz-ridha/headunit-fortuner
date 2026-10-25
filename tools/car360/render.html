@@ -1,0 +1,176 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>body{margin:0;background:#0a1626;color:#ddd;font:13px monospace}canvas{display:block}</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script></head>
+<body><pre id="log">memuat…</pre>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const P = new URLSearchParams(location.search);
+const W = +(P.get('w') || 760), H = +(P.get('h') || 440), SS = 2;          // ukuran frame + supersampling
+const ELEV = +(P.get('elev') || 11);                                          // derajat kamera di atas horizon
+const YAW0 = +(P.get('yaw0') || 0);                                           // koreksi arah depan model
+const FOV = +(P.get('fov') || 26);
+const FILL = +(P.get('fill') || 0.86);                                        // porsi lebar frame untuk mobil
+const PAINT = P.get('paint') || '#f3f3f0';
+const log = (s) => { document.getElementById('log').textContent += '\n' + s; };
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W * SS, H * SS);
+renderer.setClearColor(0x000000, 0);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = +(P.get('exp') || 1.0);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+renderer.domElement.style.width = (W / 2) + 'px';
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const key = new THREE.DirectionalLight(0xffffff, 2.2);
+key.position.set(4, 9, 6);
+key.castShadow = true;
+key.shadow.mapSize.set(2048, 2048);
+Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 30 });
+key.shadow.radius = 6;
+key.shadow.bias = -0.0005;
+scene.add(key);
+scene.add(new THREE.HemisphereLight(0xdfe8ff, 0x1a2230, 0.6));
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.55 }));
+ground.rotation.x = -Math.PI / 2;
+ground.receiveShadow = true;
+scene.add(ground);
+
+const camera = new THREE.PerspectiveCamera(FOV, W / H, 0.1, 200);
+const pivot = new THREE.Group();
+scene.add(pivot);
+
+const gltf = await new GLTFLoader().loadAsync('/model.glb');
+const car = gltf.scene;
+const names = new Set();
+car.traverse((o) => {
+  if (!o.isMesh) return;
+  o.castShadow = true;
+  const mats = Array.isArray(o.material) ? o.material : [o.material];
+  mats.forEach((m, i) => {
+    names.add(m.name);
+    if (m.name === 'primary.002') {
+      // Cat bodi: putih pearl dengan lapisan clearcoat.
+      const paint = new THREE.MeshPhysicalMaterial({
+        color: new THREE.Color(PAINT), metalness: 0.05, roughness: 0.32,
+        clearcoat: 1.0, clearcoatRoughness: 0.06, envMapIntensity: 1.0,
+      });
+      paint.name = m.name;
+      if (Array.isArray(o.material)) o.material[i] = paint; else o.material = paint;
+    } else if (m.name === 'Exterior.1' && /wheel/i.test(o.name)) {
+      // Velg: gunmetal gelap gaya TRD.
+      const rim = new THREE.MeshPhysicalMaterial({ color: new THREE.Color(P.get('wheel') || '#3a3d42'),
+        metalness: 0.75, roughness: 0.28, clearcoat: 0.6, clearcoatRoughness: 0.15 });
+      rim.name = 'rim';
+      if (Array.isArray(o.material)) o.material[i] = rim; else o.material = rim;
+    } else if (m.name === 'glass.002' || m.name === 'glass.004') {
+      // Kaca sedikit gelap.
+      m.color = new THREE.Color('#1b2430');
+      m.opacity = Math.max(m.opacity, +(P.get('glass') || 0.8));
+      m.roughness = 0.05; m.metalness = 0.2;
+    }
+  });
+});
+log('material: ' + [...names].join(', '));
+
+// Pusatkan model, alas di y=0, panjang dinormalkan.
+let box = new THREE.Box3().setFromObject(car);
+const size = box.getSize(new THREE.Vector3());
+const len = Math.max(size.x, size.z);
+car.scale.setScalar(4.6 / len);
+box = new THREE.Box3().setFromObject(car);
+const c = box.getCenter(new THREE.Vector3());
+car.position.sub(new THREE.Vector3(c.x, box.min.y, c.z));
+pivot.add(car);
+box = new THREE.Box3().setFromObject(car);
+const sz = box.getSize(new THREE.Vector3());
+log('ukuran (x,y,z): ' + sz.toArray().map((v) => v.toFixed(2)).join(', '));
+
+// Kamera: jarak dipilih agar panjang mobil (diagonal terlebar) mengisi FILL lebar frame.
+const radius = Math.hypot(sz.x, sz.z) / 2;
+const hfov = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(FOV) / 2) * camera.aspect);
+const dist = radius / Math.tan(hfov * FILL / 2);
+const el = THREE.MathUtils.degToRad(ELEV);
+camera.position.set(0, Math.sin(el) * dist + sz.y * 0.35, Math.cos(el) * dist);
+camera.lookAt(0, sz.y * 0.42, 0);
+
+const out = document.createElement('canvas');
+out.width = W; out.height = H;
+const octx = out.getContext('2d');
+octx.imageSmoothingQuality = 'high';
+
+function frame(deg) {
+  pivot.rotation.y = THREE.MathUtils.degToRad(deg + YAW0);
+  renderer.render(scene, camera);
+  octx.clearRect(0, 0, W, H);
+  octx.drawImage(renderer.domElement, 0, 0, W, H);
+  return out;
+}
+const blob = (cv, type, q) => new Promise((r) => cv.toBlob(r, type, q));
+
+const mode = P.get('mode') || 'sheet';
+if (mode === 'sheet') {
+  // Lembar kontak: beberapa sudut dalam satu gambar untuk diperiksa.
+  const angles = (P.get('angles') || '0,45,90,135,180,225,270,315').split(',').map(Number);
+  const cols = 4, rows = Math.ceil(angles.length / cols), tw = W / 2, th = H / 2;
+  const sheet = document.createElement('canvas');
+  sheet.width = cols * tw; sheet.height = rows * th;
+  const sctx = sheet.getContext('2d');
+  sctx.fillStyle = '#0c1a2d'; sctx.fillRect(0, 0, sheet.width, sheet.height);
+  sctx.font = '16px monospace'; sctx.fillStyle = '#8fb';
+  angles.forEach((a, i) => {
+    const x = (i % cols) * tw, y = Math.floor(i / cols) * th;
+    sctx.drawImage(frame(a), x, y, tw, th);
+    sctx.fillText(a + '°', x + 8, y + 20);
+  });
+  await fetch('/preview?f=' + (P.get('name') || 'sheet') + '.png', { method: 'POST', body: await blob(sheet, 'image/png') });
+  log('sheet selesai');
+} else if (mode === 'full') {
+  // Render semua sudut, cari kotak gabungan piksel yang terisi, lalu potong SEMUA frame dengan kotak yang
+  // sama, supaya mobil tidak bergeser saat diputar dan ruang kosong terbuang.
+  const n = +(P.get('n') || 72), q = +(P.get('q') || 0.86), pad = +(P.get('pad') || 6);
+  const shots = [];
+  let x0 = W, y0 = H, x1 = 0, y1 = 0;
+  for (let i = 0; i < n; i++) {
+    const cv = document.createElement('canvas');
+    cv.width = W; cv.height = H;
+    const cx = cv.getContext('2d');
+    cx.drawImage(frame(i * 360 / n), 0, 0);
+    const d = cx.getImageData(0, 0, W, H).data;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (d[(y * W + x) * 4 + 3] > 12) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    shots.push(cv);
+  }
+  x0 = Math.max(0, x0 - pad); y0 = Math.max(0, y0 - pad); x1 = Math.min(W - 1, x1 + pad); y1 = Math.min(H - 1, y1 + pad);
+  const cw = x1 - x0 + 1, ch = y1 - y0 + 1;
+  const crop = document.createElement('canvas');
+  crop.width = cw; crop.height = ch;
+  const kctx = crop.getContext('2d');
+  let bytes = 0;
+  for (let i = 0; i < n; i++) {
+    kctx.clearRect(0, 0, cw, ch);
+    kctx.drawImage(shots[i], x0, y0, cw, ch, 0, 0, cw, ch);
+    const b = await blob(crop, 'image/webp', q);
+    bytes += b.size;
+    await fetch('/save?f=car_' + String(i).padStart(2, '0') + '.webp', { method: 'POST', body: b });
+  }
+  log('full selesai: ' + n + ' frame ' + cw + 'x' + ch + ', ' + (bytes / 1024).toFixed(0) + ' KB');
+}
+document.title = 'DONE';
+</script></body></html>

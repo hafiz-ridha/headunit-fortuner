@@ -1,0 +1,2 @@
+package:com.tw.carinfoservice
+package:com.termux

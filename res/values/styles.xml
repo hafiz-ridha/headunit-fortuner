@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#FF07111F</color>
+
+    <style name="LauncherTheme" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:statusBarColor">#FF07111F</item>
+        <item name="android:navigationBarColor">#FF07111F</item>
+        <item name="android:colorAccent">#FF1685FF</item>
+        <item name="android:colorPrimary">#FF0C1A2D</item>
+        <item name="android:colorBackground">#FF0C1A2D</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+</resources>

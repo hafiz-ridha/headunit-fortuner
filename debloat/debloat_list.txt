@@ -1,0 +1,33 @@
+# Headunit UMS512 (Unisoc UIS7862), Android 10, platform TW/Dofun
+# Semua dinonaktifkan dengan `pm disable-user --user 0` (TIDAK uninstall).
+# Kembalikan: restore.sh (pm enable).
+
+# ---- TIER 1: aman, tidak menyentuh fitur utama ----
+com.android.dreams.basic                 # screensaver
+com.android.dreams.phototable            # screensaver foto
+com.android.printspooler                 # print
+com.android.bips                         # print bawaan
+com.android.printservice.recommendation  # rekomendasi print
+com.android.bookmarkprovider             # bookmark provider lama
+com.android.providers.partnerbookmarks   # bookmark partner
+com.android.emergency                    # info darurat (ponsel)
+com.android.traceur                      # system tracing (developer)
+com.android.calllogbackup                # backup log panggilan ke Google
+com.android.wallpaperbackup              # backup wallpaper
+com.android.dynsystem                    # instalasi GSI dinamis
+com.android.bluetoothmidiservice         # MIDI via Bluetooth
+com.android.hotspot2                     # login Passpoint WiFi
+com.sprd.logmanager                      # pencatat log Unisoc (makan CPU/storage)
+com.sprd.autoslt                         # tes pabrik
+com.sprd.validationtools                 # tes pabrik
+com.sprd.cameracalibration               # kalibrasi kamera pabrik
+com.spreadtrum.sgps                      # aplikasi tes GPS (bukan GPS-nya)
+com.sprd.omacp                           # provisioning SMS operator
+com.tw.bug.report                        # pelapor bug TW
+com.google.android.gmsintegration        # sampel integrasi GMS
+
+# ---- TIER 2: opsional, hemat RAM besar, ada efek samping kecil ----
+com.google.android.googlequicksearchbox  # Google app/Assistant (~235 MB RAM). Efek: tombol mic Google/"Ok Google" tidak jalan
+com.android.chrome                       # Chrome (~140 MB RAM). Efek: tidak ada browser; WebView tetap jalan
+com.abupdate.fota_demo_iot               # FOTA demo. Efek: tidak ada notifikasi update OTA
+com.sprd.firewall                        # blokir panggilan. Efek: fitur blokir nomor hilang
