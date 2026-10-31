@@ -12,13 +12,13 @@ import id.headunit.fortuner.AppLauncherRepository.Shortcut;
 
 /** Deretan pintasan aplikasi headunit. Aplikasi yang tidak terpasang tampil redup dan menjelaskan dirinya. */
 final class BottomAppDock extends LinearLayout {
-    private static final Shortcut[] ITEMS = {Shortcut.MUSIC, Shortcut.BLUETOOTH, Shortcut.RADIO, Shortcut.VIDEO,
-            Shortcut.FILES, Shortcut.EQUALIZER, Shortcut.CAR_LINK, Shortcut.DSP};
+    private static final Shortcut[] ITEMS = {Shortcut.MUSIC, Shortcut.BLUETOOTH, Shortcut.RADIO,
+            Shortcut.FILES, Shortcut.EQUALIZER, Shortcut.CAR_LINK};
     private static final int[] ICONS = {R.drawable.ic_music, R.drawable.ic_bluetooth, R.drawable.ic_radio,
-            R.drawable.ic_video, R.drawable.ic_folder, R.drawable.ic_equalizer, R.drawable.ic_phonelink, R.drawable.ic_tune};
+            R.drawable.ic_folder, R.drawable.ic_equalizer, R.drawable.ic_phonelink};
     private static final int[][] COLORS = {
-            {0xFFFF5F7E, 0xFFE0304F}, {0xFF3B9BFF, 0xFF1565E0}, {0xFF9B6BFF, 0xFF6A3FE0}, {0xFFFF7A59, 0xFFE5482E},
-            {0xFFFFC24A, 0xFFF0961C}, {0xFF55657E, 0xFF35435A}, {0xFF3DDC84, 0xFF16A35A}, {0xFF4A8DFF, 0xFF2F5FE8}};
+            {0xFFFF5F7E, 0xFFE0304F}, {0xFF3B9BFF, 0xFF1565E0}, {0xFF9B6BFF, 0xFF6A3FE0},
+            {0xFFFFC24A, 0xFFF0961C}, {0xFF55657E, 0xFF35435A}, {0xFF3DDC84, 0xFF16A35A}};
 
     private final AppLauncherRepository repo;
     private final ImageView[] tiles = new ImageView[ITEMS.length];

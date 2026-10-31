@@ -6,7 +6,10 @@ import android.widget.LinearLayout;
 
 import id.headunit.fortuner.AppLauncherRepository.Shortcut;
 
-/** Halaman Beranda: panel mobil, tiga kartu utama, widget Al-Qur'an, dock aplikasi, dan panel kontrol. */
+/**
+ * Halaman Beranda: panel mobil setinggi halaman di kiri; di kanan tiga kartu utama, widget Al-Qur'an, dan dock
+ * aplikasi; panel kontrol di bawah.
+ */
 final class HomeDashboard extends LinearLayout {
     private final LauncherActivity activity;
     private final AppLauncherRepository repo;
@@ -27,7 +30,7 @@ final class HomeDashboard extends LinearLayout {
 
         LinearLayout middle = Ui.row(a);
         vehicle = new VehiclePanel(a, tracker, a::requestLocationPermission);
-        middle.addView(vehicle, Ui.weight(0.42f, true));
+        middle.addView(vehicle, Ui.weight(0.49f, true));
         middle.addView(Ui.space(a, 16, 1));
 
         LinearLayout right = Ui.column(a);
@@ -48,13 +51,13 @@ final class HomeDashboard extends LinearLayout {
         right.addView(Ui.space(a, 1, 14));
         quran = new QuranWidget(a, () -> a.showPage(LauncherActivity.PAGE_QURAN));
         right.addView(quran, Ui.weight(0.6f, false));
-        middle.addView(right, Ui.weight(0.58f, true));
-        addView(middle, Ui.weight(1f, false));
-
+        // Dock aplikasi di bawah widget Al-Qur'an, supaya panel mobil di kiri bisa setinggi mungkin.
         dock = new BottomAppDock(a, repo);
-        LayoutParams dockLp = new LayoutParams(LayoutParams.MATCH_PARENT, Ui.px(104));
+        LayoutParams dockLp = new LayoutParams(LayoutParams.MATCH_PARENT, Ui.px(100));
         dockLp.topMargin = Ui.px(10);
-        addView(dock, dockLp);
+        right.addView(dock, dockLp);
+        middle.addView(right, Ui.weight(0.51f, true));
+        addView(middle, Ui.weight(1f, false));
 
         controls = new VehicleControlBar(a, repo);
         LayoutParams cLp = new LayoutParams(LayoutParams.MATCH_PARENT, Ui.px(62));

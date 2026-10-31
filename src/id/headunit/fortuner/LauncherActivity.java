@@ -200,11 +200,13 @@ public class LauncherActivity extends Activity implements LocationTracker.Listen
         refreshStatus();
         refreshApps();
         if (dashboard != null) dashboard.controls.refreshVolume();
+        MapPip.setResumed(this, true);
     }
 
     @Override
     protected void onPause() {
         resumed = false;
+        MapPip.setResumed(this, false);
         super.onPause();
     }
 

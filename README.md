@@ -33,12 +33,13 @@ Diambil langsung dari headunit (1280×720).
 | Lokasi otomatis | Saat tersambung internet, setelan Lokasi Android dinyalakan bila mati (butuh `pm grant … WRITE_SECURE_SETTINGS` lewat ADB). Cuaca memakai GPS, lalu lokasi jaringan, lalu perkiraan dari IP ([geojs.io](https://www.geojs.io)) | LocationManager, get.geojs.io |
 | Sidebar | Beranda, Aplikasi, Pengaturan | – |
 | Panel mobil | Fortuner putih 360° (berputar mengikuti jari, berhenti saat jari dilepas, kembali ke sudut awal setelah 8 detik), kecepatan, status GPS, Trip GPS (tekan lama untuk reset) | 72 gambar render dari model 3D, GPS headunit |
+| Panel navigasi | Selama Google Maps/Waze memandu arah, gambar mobil berganti petunjuk belokan. Dengan ADB lokal, peta rute Google Maps yang asli (picture-in-picture) dipasang terkunci tepat di panel dengan tepi gradien sesuai tema (geser diabaikan, ketuk membuka Maps). Tombol di atas peta: minimize (kembali ke petunjuk arah, ada tombol peta untuk menampilkannya lagi) dan close (kembali ke gambar mobil; chip "Navigasi berjalan · Tampilkan" untuk membukanya lagi). Peta disembunyikan otomatis saat Beranda tertutup/kamera mundur dan ditutup setelah navigasi selesai | Notifikasi navigasi, Google Maps PiP |
 | Kartu utama | YouTube (aplikasi YouTube; bila belum terpasang, menawarkan Play Store), Navigasi (Maps/Waze/dll.), Al-Qur'an | Aplikasi terpasang |
 | Widget Al-Qur'an | Ayat Arab (RTL), transliterasi, terjemahan, ayat sebelum/berikut, putar/jeda, buka mushaf, pilihan tampilan | `assets/quran` (equran.id / Kemenag RI) |
 | Halaman Al-Qur'an | 114 surah, 6.236 ayat, murattal per ayat yang lanjut otomatis ke surah berikutnya sampai An-Nas, unduh per surah atau semua | idem, audio dari cdn.equran.id |
 | Murattal offline | Audio diunduh ke `Android/data/id.headunit.fortuner/files/murattal` (±1,5–2 GB untuk semua). Unduh otomatis di Wi-Fi rumah; bisa dijeda/dihapus di Pengaturan | cdn.equran.id |
 | Doa naik kendaraan | Saat headunit menyala (boot, atau layar menyala lagi setelah mati ≥1 menit): overlay doa QS. Az-Zukhruf 13–14 + audio di speaker (volume minimal 80% + penguatan 6 dB), tanpa internet; overlay disembunyikan selama kamera mundur tampil | `assets/doa` |
-| Dock | Musik, Bluetooth, Radio, Video, File Manager, Equalizer, Car Link, DSP | Aplikasi TW headunit |
+| Dock | Musik, Bluetooth, Radio, File Manager, Equalizer, Car Link (di bawah widget Al-Qur'an) | Aplikasi TW headunit |
 | Panel kontrol | Pengaturan kendaraan (CarSetting), volume | AudioManager |
 
 ## Keterbatasan (jujur)
@@ -103,6 +104,8 @@ adb -s 192.168.18.136:5555 shell appops set id.headunit.fortuner SYSTEM_ALERT_WI
 adb -s 192.168.18.136:5555 shell appops set id.headunit.fortuner GET_USAGE_STATS allow
 adb -s 192.168.18.136:5555 shell pm grant id.headunit.fortuner android.permission.WRITE_SECURE_SETTINGS
 adb -s 192.168.18.136:5555 shell cmd package set-home-activity id.headunit.fortuner/.LauncherActivity
+adb -s 192.168.18.136:5555 shell cmd notification allow_listener id.headunit.fortuner/id.headunit.fortuner.NavNotificationListener
+adb -s 192.168.18.136:5555 shell appops set com.google.android.apps.maps PICTURE_IN_PICTURE allow
 ```
 
 - `sleepKillPackage.cfg`: launcher tidak dimatikan saat OFF (satu nama paket per baris).
@@ -110,6 +113,11 @@ adb -s 192.168.18.136:5555 shell cmd package set-home-activity id.headunit.fortu
 - `GET_USAGE_STATS`: mengenali launcher Dofun yang muncul sendiri setelah menyala. Hanya launcher Dofun yang
   diganti; kamera mundur, musik, Maps, dll. tidak pernah ditimpa.
 - `WRITE_SECURE_SETTINGS`: menyalakan Lokasi otomatis saat tersambung internet.
+- `allow_listener`: membaca panduan arah Google Maps/Waze untuk panel navigasi di Beranda.
+- `PICTURE_IN_PICTURE`: Google Maps boleh tampil sebagai jendela kecil; launcher memindahkannya ke panel mobil.
+  Pemindahan memakai ADB lokal (port 5555 harus terbuka): sekali saja buka **Pengaturan › Navigasi › ADB lokal
+  untuk peta › Hubungkan**, centang *Always allow*, lalu **Allow**. Tanpa ADB lokal panel tetap menampilkan
+  petunjuk teks.
 
 Launcher menjalankan layanan siaga kecil (notifikasi "Fortuner Launcher siaga", prioritas minimum) agar pendengar
 "headunit menyala" selalu aktif.

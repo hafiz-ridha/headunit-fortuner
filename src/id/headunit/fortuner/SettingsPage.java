@@ -69,6 +69,19 @@ final class SettingsPage extends ScrollView {
         info("Sumber teks", "equran.id (Al-Qur'an & terjemahan Kemenag RI), disimpan offline: 114 surah, 6.236 ayat. "
                 + "Murattal Misyari Rasyid Al-Afasi dari cdn.equran.id.");
 
+        section("NAVIGASI");
+        boolean navAccess = NavNotificationListener.hasAccess(a);
+        action("Panel navigasi di Beranda", navAccess
+                        ? "Aktif. Selama Google Maps/Waze memandu arah, gambar mobil berganti menjadi panel belokan berikutnya."
+                        : "Butuh akses notifikasi agar panduan arah Google Maps/Waze bisa tampil menggantikan gambar mobil.",
+                navAccess ? "Info" : "Izinkan", () -> repo.start(a,
+                        new Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)));
+        toggle("Peta Google Maps di panel", "Peta rute asli Google Maps tampil real-time di panel mobil, "
+                + "menyatu dengan tema. Disembunyikan otomatis saat Beranda tertutup atau kamera mundur aktif.",
+                MapPip.PREF, true, MapPip::refresh);
+        action("ADB lokal untuk peta", MapPip.status, "Hubungkan", () -> MapPip.authorize(a, this::rebuild));
+
         section("MURATTAL OFFLINE");
         int done = QuranAudioStore.completeSurahs(a);
         String status = QuranDownloadService.running ? "Sedang mengunduh. Progres tampil di halaman Al-Qur'an dan notifikasi."

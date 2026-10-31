@@ -102,6 +102,17 @@ final class Ui {
         return g;
     }
 
+    /** Warna di antara a dan b (f = 0..1), mis. untuk mencari warna gradien di posisi tertentu. */
+    static int blend(int a, int b, float f) {
+        f = Math.max(0f, Math.min(1f, f));
+        int r = 0;
+        for (int shift = 0; shift <= 24; shift += 8) {
+            int ca = (a >>> shift) & 0xff, cb = (b >>> shift) & 0xff;
+            r |= Math.round(ca + (cb - ca) * f) << shift;
+        }
+        return r;
+    }
+
     static GradientDrawable gradient(int top, int bottom, float radius) {
         GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{top, bottom});
         g.setCornerRadius(px(radius));

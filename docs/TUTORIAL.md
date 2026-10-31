@@ -73,6 +73,8 @@ adb -s 192.168.18.136:5555 shell appops set id.headunit.fortuner GET_USAGE_STATS
 adb -s 192.168.18.136:5555 shell pm grant id.headunit.fortuner android.permission.WRITE_SECURE_SETTINGS
 adb -s 192.168.18.136:5555 shell pm grant id.headunit.fortuner android.permission.ACCESS_FINE_LOCATION
 adb -s 192.168.18.136:5555 shell cmd package set-home-activity id.headunit.fortuner/.LauncherActivity
+adb -s 192.168.18.136:5555 shell cmd notification allow_listener id.headunit.fortuner/id.headunit.fortuner.NavNotificationListener
+adb -s 192.168.18.136:5555 shell appops set com.google.android.apps.maps PICTURE_IN_PICTURE allow
 ```
 
 | Perintah | Fungsinya |
@@ -83,6 +85,8 @@ adb -s 192.168.18.136:5555 shell cmd package set-home-activity id.headunit.fortu
 | `WRITE_SECURE_SETTINGS` | Lokasi menyala otomatis saat tersambung internet |
 | `ACCESS_FINE_LOCATION` | Kecepatan, trip GPS, dan cuaca |
 | `set-home-activity` | Fortuner Launcher jadi launcher utama |
+| `allow_listener` | Panel navigasi Google Maps/Waze menggantikan gambar mobil saat navigasi |
+| `PICTURE_IN_PICTURE` | Peta Google Maps bisa dipasang di panel mobil (sekali saja: **Pengaturan › Navigasi › ADB lokal untuk peta › Hubungkan**, centang *Always allow*, **Allow**) |
 
 ## 7. Cek hasilnya
 

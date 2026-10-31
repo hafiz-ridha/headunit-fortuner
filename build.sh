@@ -20,7 +20,7 @@ if [ -z "${JAVA_HOME:-}" ]; then JAVA_HOME="$(ls -d "$LOCAL"/Programs/jdk-17* 2>
 JAVA_HOME="$(to_unix "$JAVA_HOME")"
 export JAVA_HOME PATH="$JAVA_HOME/bin:$PATH"
 ADB="${ADB:-$LOCAL/Android/platform-tools/adb.exe}"
-DEVICE="${DEVICE:-192.168.18.136:5555}"
+DEVICE="${DEVICE:-192.168.18.78:5555}"
 
 for f in "$BT/aapt2.exe" "$BT/aapt.exe" "$BT/d8.bat" "$BT/zipalign.exe" "$BT/apksigner.bat" "$PLATFORM" "$JAVA_HOME/bin/javac.exe"; do
   [ -e "$f" ] || { echo "Tidak ditemukan: $f" >&2; exit 1; }

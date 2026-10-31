@@ -36,12 +36,10 @@ final class AppLauncherRepository {
         MUSIC("Musik", "com.tw.music"),
         BLUETOOTH("Bluetooth", "com.tw.bt"),
         RADIO("Radio", "com.tw.radio"),
-        VIDEO("Video", "com.tw.video"),
         FILES("File Manager", "com.tw.twfileexplore", "com.android.documentsui"),
         EQUALIZER("Equalizer", "com.tw.eq/.EQActivity", "com.tw.eq"),
         CAR_LINK("Car Link", "com.zjinnova.zlink", "net.easyconn", "com.suding.speedplay",
                 "com.carbit.mapp", "com.ucar.ucarlink", "cn.manstep.phonemirror", "com.autokit.autokit"),
-        DSP("DSP", "com.tw.eq/.DSPActivity"),
         VEHICLE("Pengaturan Kendaraan", "com.dofun.carsetting/.ui.MainActivity", "com.dofun.carsetting");
 
         final String label;
